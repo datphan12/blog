@@ -4,7 +4,11 @@ const { engine } = require("express-handlebars");
 const path = require("path");
 const app = express();
 const port = 3000;
-const route = require("./resources/routes");
+const route = require("./routes/index");
+const db = require("./config/db/index");
+
+// Connect db
+db.connect();
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
@@ -25,7 +29,7 @@ app.engine(
   })
 );
 app.set("view engine", "hbs");
-app.set("views", path.join(__dirname, "resources/views"));
+app.set("views", path.join(__dirname, "resources", "views"));
 
 //Route init
 route(app);
