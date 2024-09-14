@@ -6,6 +6,7 @@ const app = express();
 const port = 3000;
 const route = require("./routes/index");
 const db = require("./config/db/index");
+var methodOverride = require("method-override");
 
 // Connect db
 db.connect();
@@ -18,6 +19,9 @@ app.use(
 );
 app.use(express.json());
 
+// override with POST having ?_method=DELETE
+app.use(methodOverride("_method"));
+
 //HTTP logger
 app.use(morgan("combined"));
 
@@ -26,6 +30,9 @@ app.engine(
   "hbs",
   engine({
     extname: ".hbs",
+    helpers: {
+      sum: (a, b) => a + b,
+    },
   })
 );
 app.set("view engine", "hbs");
