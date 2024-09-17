@@ -16,13 +16,12 @@ class CourseController {
   //[POST] /courses/store
   async store(req, res, next) {
     try {
-      const formData = req.body;
-      formData.image = `https://i.ytimg.com/vi/${req.body.videoId}/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLCML-byK5TPhWN_-ZuZal4h5KasYw`;
+      req.body.image = `https://i.ytimg.com/vi/${req.body.videoId}/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLCML-byK5TPhWN_-ZuZal4h5KasYw`;
 
-      const course = new Course(formData);
+      const course = new Course(req.body);
       await course.save();
 
-      res.redirect("/");
+      res.redirect("/me/stored/courses");
     } catch (err) {
       console.log(err);
       next(err);
@@ -43,12 +42,28 @@ class CourseController {
       .catch(next);
   }
 
+  //[PATCH] /courses/:id/restore
+  restore(req, res, next) {
+    Course.restore({ _id: req.params.id })
+      .then(() => res.redirect("back"))
+      .catch(next);
+  }
+
   //[DELETE] /courses/:id
   destroy(req, res, next) {
+    Course.delete({ _id: req.params.id })
+      .then(() => res.redirect("back"))
+      .catch(next);
+  }
+
+  //[DELETE] /courses/:id/force
+  forceDestroy(req, res, next) {
     Course.deleteOne({ _id: req.params.id })
       .then(() => res.redirect("back"))
       .catch(next);
   }
+
+  
 }
 
 module.exports = new CourseController();
