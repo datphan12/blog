@@ -6,7 +6,8 @@ const app = express();
 const port = 3000;
 const route = require("./routes/index");
 const db = require("./config/db/index");
-var methodOverride = require("method-override");
+const methodOverride = require("method-override");
+const sortMiddleware = require("./app/middlewares/SortMiddleware");
 
 // Connect db
 db.connect();
@@ -18,6 +19,9 @@ app.use(
   })
 );
 app.use(express.json());
+
+//using middleware
+app.use(sortMiddleware);
 
 // override with POST having ?_method=DELETE
 app.use(methodOverride("_method"));
@@ -32,6 +36,29 @@ app.engine(
     extname: ".hbs",
     helpers: {
       sum: (a, b) => a + b,
+
+      sortable: (field, sort) => {
+        const sortType = field === sort.column ? sort.type : 'default';
+
+        const icons = {
+          default: 'bi bi-chevron-expand',
+          desc: 'bi bi-sort-down',
+          asc: 'bi bi-sort-down-alt',
+        }
+
+        const types = {
+          default: 'desc',
+          desc: 'asc',
+          asc: 'desc',
+        }
+
+        const icon = icons[sortType];
+        const type = types[sortType];
+
+        return `<a href="?_sort&column=${field}&type=${type}">
+            <i class="${icon}"></i>
+          </a>`;
+      }
     },
   })
 );
